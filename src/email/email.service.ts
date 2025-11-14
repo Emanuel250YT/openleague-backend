@@ -1,21 +1,118 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
+
+type EmailProvider = 'resend' | 'smtp';
 
 @Injectable()
 export class EmailService {
-  private transporter: nodemailer.Transporter;
+  private readonly logger = new Logger(EmailService.name);
+  private transporter: nodemailer.Transporter | null = null;
+  private resend: Resend | null = null;
+  private provider: EmailProvider;
+  private fromEmail: string;
 
   constructor(private configService: ConfigService) {
+    // Determine which email provider to use
+    this.provider = (this.configService.get('EMAIL_PROVIDER') || 'smtp') as EmailProvider;
+    
+    if (this.provider === 'resend') {
+      this.initializeResend();
+    } else {
+      this.initializeSMTP();
+    }
+  }
+
+  private initializeResend() {
+    const apiKey = this.configService.get('RESEND_API_KEY');
+    
+    if (!apiKey) {
+      this.logger.error('RESEND_API_KEY not configured');
+      throw new Error('RESEND_API_KEY is required when using Resend provider');
+    }
+
+    this.resend = new Resend(apiKey);
+    this.fromEmail = this.configService.get('RESEND_FROM_EMAIL') || 'OpenLeague <noreply@openleague.com>';
+    this.logger.log('Email service initialized with Resend provider');
+  }
+
+  private initializeSMTP() {
+    const host = this.configService.get('EMAIL_HOST') || 'smtp.gmail.com';
+    const port = parseInt(this.configService.get('EMAIL_PORT') || '587');
+    const user = this.configService.get('EMAIL_USER');
+    const pass = this.configService.get('EMAIL_PASSWORD');
+
+    if (!user || !pass) {
+      this.logger.error('EMAIL_USER and EMAIL_PASSWORD not configured');
+      throw new Error('EMAIL_USER and EMAIL_PASSWORD are required when using SMTP provider');
+    }
+
     this.transporter = nodemailer.createTransport({
-      host: this.configService.get('EMAIL_HOST') || 'smtp.gmail.com',
-      port: this.configService.get('EMAIL_PORT') || 587,
-      secure: false, // true for 465, false for other ports
+      host,
+      port,
+      secure: port === 465, // true for 465, false for other ports
       auth: {
-        user: this.configService.get('EMAIL_USER'),
-        pass: this.configService.get('EMAIL_PASSWORD'),
+        user,
+        pass,
       },
     });
+
+    this.fromEmail = `"OpenLeague" <${user}>`;
+    this.logger.log(`Email service initialized with SMTP provider (${host}:${port})`);
+  }
+
+  private async sendWithResend(to: string, subject: string, html: string): Promise<void> {
+    if (!this.resend) {
+      throw new Error('Resend client not initialized');
+    }
+
+    try {
+      const { data, error } = await this.resend.emails.send({
+        from: this.fromEmail,
+        to,
+        subject,
+        html,
+      });
+
+      if (error) {
+        this.logger.error('Resend error:', error);
+        throw new Error(`Failed to send email via Resend: ${error.message}`);
+      }
+
+      this.logger.log(`Email sent via Resend to ${to} (ID: ${data?.id})`);
+    } catch (error) {
+      this.logger.error('Error sending email via Resend:', error);
+      throw error;
+    }
+  }
+
+  private async sendWithSMTP(to: string, subject: string, html: string): Promise<void> {
+    if (!this.transporter) {
+      throw new Error('SMTP transporter not initialized');
+    }
+
+    try {
+      const info = await this.transporter.sendMail({
+        from: this.fromEmail,
+        to,
+        subject,
+        html,
+      });
+
+      this.logger.log(`Email sent via SMTP to ${to} (Message ID: ${info.messageId})`);
+    } catch (error) {
+      this.logger.error('Error sending email via SMTP:', error);
+      throw error;
+    }
+  }
+
+  private async sendEmail(to: string, subject: string, html: string): Promise<void> {
+    if (this.provider === 'resend') {
+      return this.sendWithResend(to, subject, html);
+    } else {
+      return this.sendWithSMTP(to, subject, html);
+    }
   }
 
   async sendOtpEmail(email: string, code: string, purpose: string): Promise<void> {
@@ -40,12 +137,7 @@ export class EmailService {
       </div>
     `;
 
-    await this.transporter.sendMail({
-      from: `"OpenLeague" <${this.configService.get('EMAIL_USER')}>`,
-      to: email,
-      subject,
-      html,
-    });
+    await this.sendEmail(email, subject, html);
   }
 
   async sendWelcomeEmail(email: string, name: string): Promise<void> {
@@ -59,11 +151,6 @@ export class EmailService {
       </div>
     `;
 
-    await this.transporter.sendMail({
-      from: `"OpenLeague" <${this.configService.get('EMAIL_USER')}>`,
-      to: email,
-      subject: 'Bienvenido a OpenLeague',
-      html,
-    });
+    await this.sendEmail(email, 'Bienvenido a OpenLeague', html);
   }
 }
