@@ -16,10 +16,10 @@ import {
   Logger,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UploadService } from './upload.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { GetUser } from '../auth/decorators/get-user.decorator';
-import { UploadFileDto } from './dto';
+import { UploadService } from './upload.service.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { GetUser } from '../auth/decorators/get-user.decorator.js';
+import { UploadFileDto } from './dto/index.js';
 
 @Controller('upload')
 @UseGuards(JwtAuthGuard)

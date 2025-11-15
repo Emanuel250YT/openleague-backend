@@ -8,10 +8,10 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
-import { PrismaService } from '../prisma/prisma.service';
-import { EmailService } from '../email/email.service';
-import { RegisterDto, LoginDto, VerifyOtpDto, AddWalletDto, CreateOpenLeagueWalletDto } from './dto';
-import { JwtPayload, AuthResponse } from './interfaces/auth.interface';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { EmailService } from '../email/email.service.js';
+import { RegisterDto, LoginDto, VerifyOtpDto, AddWalletDto, CreateOpenLeagueWalletDto } from './dto/index.js';
+import { JwtPayload, AuthResponse } from './interfaces/auth.interface.js';
 import { CdpClient } from '@coinbase/cdp-sdk';
 
 @Injectable()

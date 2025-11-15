@@ -15,10 +15,10 @@ import {
   ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
-import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto, VerifyOtpDto, AddWalletDto, CreateOpenLeagueWalletDto } from './dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { GetUser } from './decorators/get-user.decorator';
+import { AuthService } from './auth.service.js';
+import { RegisterDto, LoginDto, VerifyOtpDto, AddWalletDto, CreateOpenLeagueWalletDto } from './dto/index.js';
+import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
+import { GetUser } from './decorators/get-user.decorator.js';
 
 @ApiTags('auth')
 @Controller('auth')
