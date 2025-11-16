@@ -21,19 +21,20 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  tournaments          Tournament[]
-  wallets              Wallet[]
-  tokens               Token[]
-  otpCodes             OtpCode[]
-  files                File[]
-  playerProfile        PlayerProfile?
-  clubProfile          ClubProfile?
-  coachProfile         CoachProfile?
-  fanProfile           FanProfile?
-  notifications        Notification[]
-  challengeSubmissions ChallengeSubmission[]
-  campaigns            PlayerCampaign[] // Campañas donde el usuario es el jugador
-  createdCampaigns     PlayerCampaign[]      @relation("CampaignCreator") // Campañas creadas por el admin
+  tournaments             Tournament[]
+  wallets                 Wallet[]
+  tokens                  Token[]
+  otpCodes                OtpCode[]
+  files                   File[]
+  playerProfile           PlayerProfile?
+  clubProfile             ClubProfile?
+  coachProfile            CoachProfile?
+  fanProfile              FanProfile?
+  notifications           Notification[]
+  challengeSubmissions    ChallengeSubmission[]
+  campaigns               PlayerCampaign[] // Campañas donde el usuario es el jugador
+  createdCampaigns        PlayerCampaign[]          @relation("CampaignCreator") // Campañas creadas por el admin
+  ChallengeSubmissionVote ChallengeSubmissionVote[]
 
   @@map("users")
 }
@@ -426,10 +427,29 @@ model ChallengeSubmission {
   challengeId String
   challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
 
+  votes ChallengeSubmissionVote[]
+
   @@unique([userId, challengeId]) // Un usuario solo puede enviar una participación por reto
   @@index([challengeId, status])
   @@index([userId])
   @@map("challenge_submissions")
+}
+
+model ChallengeSubmissionVote {
+  id        String   @id @default(uuid())
+  value     Int // +1 (upvote) | -1 (downvote)
+  createdAt DateTime @default(now())
+
+  submissionId String
+  submission   ChallengeSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, submissionId]) // Un usuario solo puede votar una vez por participación
+  @@index([submissionId])
+  @@index([userId])
+  @@map("challenge_submission_votes")
 }
 
 // ============================================

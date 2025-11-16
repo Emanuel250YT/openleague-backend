@@ -12,11 +12,7 @@ import { UpdateChallengeDto } from './dto/update-challenge.dto.js';
 import { CreateSubmissionDto } from './dto/create-submission.dto.js';
 import { UpdateSubmissionDto } from './dto/update-submission.dto.js';
 import { ChallengeFilterDto } from './dto/challenge-filter.dto.js';
-import {
-  ChallengeDifficulty,
-  ChallengeStatus,
-  SubmissionStatus,
-} from '@prisma/client';
+import { ChallengeDifficulty, ChallengeStatus, SubmissionStatus } from '@prisma/client';
 
 @Injectable()
 export class ChallengeService {
@@ -33,7 +29,7 @@ export class ChallengeService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notificationService: NotificationService,
-  ) { }
+  ) {}
 
   /**
    * Crear un nuevo reto (manual o automático)
@@ -190,6 +186,62 @@ export class ChallengeService {
   // GESTIÓN DE PARTICIPACIONES (SUBMISSIONS)
   // ============================================
 
+  async voteSubmission(userId: string, submissionId: string, value: 1 | -1) {
+    const submission = await this.findSubmission(submissionId);
+
+    const existing = await this.prisma.challengeSubmissionVote.findUnique({
+      where: {
+        userId_submissionId: { userId, submissionId },
+      },
+    });
+
+    if (existing) {
+      if (existing.value === value) {
+        await this.prisma.challengeSubmissionVote.delete({
+          where: { userId_submissionId: { userId, submissionId } },
+        });
+      } else {
+        await this.prisma.challengeSubmissionVote.update({
+          where: { userId_submissionId: { userId, submissionId } },
+          data: { value },
+        });
+      }
+    } else {
+      await this.prisma.challengeSubmissionVote.create({
+        data: {
+          userId,
+          submissionId: submission.id,
+          value,
+        },
+      });
+    }
+
+    return this.getSubmissionVotes(submission.id);
+  }
+
+  async getSubmissionVotes(submissionId: string) {
+    await this.findSubmission(submissionId);
+
+    const [up, down, sum] = await Promise.all([
+      this.prisma.challengeSubmissionVote.count({
+        where: { submissionId, value: 1 },
+      }),
+      this.prisma.challengeSubmissionVote.count({
+        where: { submissionId, value: -1 },
+      }),
+      this.prisma.challengeSubmissionVote.aggregate({
+        _sum: { value: true },
+        where: { submissionId },
+      }),
+    ]);
+
+    return {
+      up,
+      down,
+      score: sum._sum.value ?? 0,
+    };
+  }
+
   /**
    * Crear una participación en un reto
    */
@@ -271,7 +323,7 @@ export class ChallengeService {
   async findChallengeSubmissions(challengeId: string) {
     const challenge = await this.findOne(challengeId);
 
-    return this.prisma.challengeSubmission.findMany({
+    const submissions = await this.prisma.challengeSubmission.findMany({
       where: { challengeId: challenge.id },
       include: {
         user: {
@@ -287,9 +339,39 @@ export class ChallengeService {
             },
           },
         },
+        _count: {
+          select: { votes: true },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    // Obtener conteos UP/DOWN para evitar N+1
+    const [upCounts, downCounts] = await Promise.all([
+      this.prisma.challengeSubmissionVote.groupBy({
+        by: ['submissionId'],
+        where: { submissionId: { in: submissions.map((s) => s.id) }, value: 1 },
+        _count: { _all: true },
+      }),
+      this.prisma.challengeSubmissionVote.groupBy({
+        by: ['submissionId'],
+        where: { submissionId: { in: submissions.map((s) => s.id) }, value: -1 },
+        _count: { _all: true },
+      }),
+    ]);
+
+    const upMap = new Map(upCounts.map((r) => [r.submissionId, r._count._all]));
+    const downMap = new Map(downCounts.map((r) => [r.submissionId, r._count._all]));
+
+    return submissions.map((s) => ({
+      ...s,
+      votes: {
+        up: upMap.get(s.id) ?? 0,
+        down: downMap.get(s.id) ?? 0,
+        score: (upMap.get(s.id) ?? 0) - (downMap.get(s.id) ?? 0),
+        total: (upMap.get(s.id) ?? 0) + (downMap.get(s.id) ?? 0),
+      },
+    }));
   }
 
   /**
@@ -315,6 +397,19 @@ export class ChallengeService {
     }
 
     return submission;
+  }
+
+  async findSubmissions() {
+    console.log('findSubmissions')
+    const submissions = await this.prisma.challengeSubmission.findMany();
+
+    console.log(submissions)
+
+    if (!submissions) {
+      throw new NotFoundException('Submissions not found');
+    }
+
+    return submissions;
   }
 
   /**

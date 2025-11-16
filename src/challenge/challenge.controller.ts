@@ -17,6 +17,7 @@ import { UpdateChallengeDto } from './dto/update-challenge.dto.js';
 import { CreateSubmissionDto } from './dto/create-submission.dto.js';
 import { UpdateSubmissionDto } from './dto/update-submission.dto.js';
 import { ChallengeFilterDto } from './dto/challenge-filter.dto.js';
+import { VoteSubmissionDto, VoteDirection } from './dto/vote-submission.dto.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 
 @Controller('challenges')
@@ -69,6 +70,20 @@ export class ChallengeController {
     return this.challengeService.findActive();
   }
 
+  @Get('submissions')
+  @ApiTags('submissions')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Obtener totas las participaciones',
+    description: 'Lista todas las participaciones de los usuarios en cualquier reto'
+  })
+  @ApiResponse({ status: 200, description: 'Lista de participaciones obtenida exitosamente' })
+  @ApiResponse({ status: 401, description: 'No autorizado' })
+  async findSubmissions(@Request() req) {
+    return this.challengeService.findSubmissions();
+  }
+  
   @Get(':id')
   @ApiTags('challenges')
   @ApiOperation({
@@ -212,5 +227,38 @@ export class ChallengeController {
   @ApiResponse({ status: 404, description: 'Participación no encontrada' })
   async removeSubmission(@Param('id') id: string, @Request() req) {
     return this.challengeService.removeSubmission(id, req.user.id);
+  }
+
+  @Post('submissions/:id/vote')
+  @ApiTags('submissions')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Votar participación (pulgar arriba/abajo)',
+    description: 'Permite votar una participación. Repetir el mismo voto la quita (toggle).'
+  })
+  @ApiParam({ name: 'id', description: 'ID de la participación' })
+  @ApiBody({ type: VoteSubmissionDto })
+  @ApiResponse({ status: 200, description: 'Voto registrado' })
+  @ApiResponse({ status: 401, description: 'No autorizado' })
+  async voteSubmission(
+    @Param('id') id: string,
+    @Request() req,
+    @Body() dto: VoteSubmissionDto,
+  ) {
+    const value = dto.value === VoteDirection.UP ? 1 : -1;
+    return this.challengeService.voteSubmission(req.user.id, id, value);
+  }
+
+  @Get('submissions/:id/votes')
+  @ApiTags('submissions')
+  @ApiOperation({
+    summary: 'Obtener conteos de votos de una participación',
+    description: 'Devuelve up, down y score acumulado.'
+  })
+  @ApiParam({ name: 'id', description: 'ID de la participación' })
+  @ApiResponse({ status: 200, description: 'Conteos obtenidos' })
+  async getSubmissionVotes(@Param('id') id: string) {
+    return this.challengeService.getSubmissionVotes(id);
   }
 }
