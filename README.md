@@ -486,14 +486,16 @@ El contrato `TournamentManager` incluye:
 
 MIT
 
-MILESTONE 2 PLAN — Open League
+# MILESTONE 2 PLAN — Open League
+
 The future of discovery, scouting & player growth for amateur football worldwide.
 
 Team: Mariano Velarde & Emanuel Guzmán
 Track: ✔ SHIP-A-TON
 Date: Noviembre 2025
 
-📍 WHERE WE ARE NOW
+## 📍 WHERE WE ARE NOW
+
 What we built/validated this weekend
 
 Validamos el concepto central: un sistema de retos + videos + ranking que permite que jugadores amateurs puedan mostrar su progreso y tener visibilidad global.
@@ -504,7 +506,7 @@ Probamos el concepto con lapachanga.club, una comunidad real de jugadores casual
 
 Probamos el flujo básico de carga de videos, validamos que el proceso es intuitivo y atractivo para jugadores jóvenes.
 
-What's working
+## What's working
 
 La gamificación genera una respuesta muy fuerte: los jugadores quieren mejorar, avanzar en rankings y cumplir retos.
 
@@ -536,7 +538,8 @@ Necesidad de una estructura legal sólida debido a la naturaleza internacional d
 
 Necesidad de apoyo experto para tokenomics (esperamos obtenerlo con Polkadot).
 
-🚀 WHAT WE'LL SHIP IN 30 DAYS
+## 🚀 WHAT WE'LL SHIP IN 30 DAYS
+
 Our MVP will do this
 
 Open League permitirá que jugadores amateurs suban videos cumpliendo retos deportivos, reciban puntuaciones y compitan en rankings visibles por clubes, marcas y creadores.
@@ -577,7 +580,8 @@ Feature: Panel interno para validar y moderar videos
 Why it matters: Garantiza fairness, combate contenido fraudulento y protege la reputación del piloto.
 Who builds it: Emanuel Guzmán.
 
-👥 Team Breakdown
+## 👥 Team Breakdown
+
 Mariano Velarde — CEO / BizDev / Community Lead | 10–20 hrs/semana
 
 Fundador de lapachanga.club, comunidad real de jugadores amateurs.
@@ -598,7 +602,8 @@ Responsable de arquitectura, desarrollo del MVP, base de datos, retos y scoring.
 
 Coordina tokenomics con mentores de Polkadot.
 
-🧠 Mentoring & Expertise We Need
+## 🧠 Mentoring & Expertise We Need
+
 Areas where we need support
 
 Marco legal y compliance para contratos internacionales y donaciones.
@@ -615,7 +620,8 @@ Asesores deportivos profesionales para calibrar retos y métricas.
 
 Mentoría en escalado de plataformas UGC para comunidades masivas.
 
-🎯 WHAT HAPPENS AFTER
+## 🎯 WHAT HAPPENS AFTER
+
 When M2 is done, we plan to…
 
 Lanzar el MVP público para los primeros 100 jugadores reales antes del fin del mes.
@@ -640,7 +646,7 @@ Incorporar tokenomics optimizados con Polkadot para recompensas, transparencia y
 
 Superar los 10.000 jugadores registrados y tener un ecosistema activo, con retos, ranking y scouting real.
 
-🏁 Open League: una liga abierta al mundo
+## 🏁 Open League: una liga abierta al mundo
 
 Construimos una herramienta que permite que cualquier jugador, desde cualquier potrero, pueda competir, progresar y ser visto.
 Creemos en el talento oculto.
