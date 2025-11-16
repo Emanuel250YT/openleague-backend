@@ -32,6 +32,8 @@ model User {
   fanProfile           FanProfile?
   notifications        Notification[]
   challengeSubmissions ChallengeSubmission[]
+  campaigns            PlayerCampaign[] // Campañas donde el usuario es el jugador
+  createdCampaigns     PlayerCampaign[]      @relation("CampaignCreator") // Campañas creadas por el admin
 
   @@map("users")
 }
@@ -428,4 +430,54 @@ model ChallengeSubmission {
   @@index([challengeId, status])
   @@index([userId])
   @@map("challenge_submissions")
+}
+
+// ============================================
+// SISTEMA DE CAMPAÑAS DE JUGADORES
+// ============================================
+
+enum CampaignStatus {
+  DRAFT // Borrador
+  ACTIVE // Activa
+  PAUSED // Pausada
+  COMPLETED // Completada
+  CANCELLED // Cancelada
+}
+
+model PlayerCampaign {
+  id                 String         @id @default(uuid())
+  // Información básica
+  title              String
+  description        String?
+  photoUrl           String? // Foto principal de la campaña
+  presentationVideo  String? // URL del video de presentación
+  // Rating OL del jugador
+  olRating           Int            @default(0) // Rating OL actual (ej: 78/100)
+  // Metas deportivas
+  sportingGoals      Json // Array de metas: [{goal: "Mejorar precisión de pase al 90%"}]
+  // Presupuesto desglosado
+  budget             Json // {nutrition: 200, personalTrainer: 350, travels: 300, equipment: 150, physiotherapy: 200, total: 1200}
+  // Cronograma/Timeline
+  timeline           Json // Array: [{date: "2025-02-01", milestone: "Semana 1: +2 puntos OL"}]
+  // Retos destacados verificados
+  featuredChallenges Json? // Array: [{name: "Control orientado bajo presión", category: "Técnica", points: 50, validated: true, validator: "Staff OL"}]
+  // Estado y fechas
+  status             CampaignStatus @default(DRAFT)
+  startDate          DateTime?
+  endDate            DateTime?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  // Relación con el jugador
+  playerId String
+  player   User   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  // Relación con quien creó la campaña (admin/super admin)
+  createdById String
+  createdBy   User   @relation("CampaignCreator", fields: [createdById], references: [id])
+
+  @@index([playerId])
+  @@index([status])
+  @@index([createdById])
+  @@map("player_campaigns")
 }

@@ -12,6 +12,7 @@ import { ChallengeModule } from './challenge/challenge.module.js';
 import { TasksModule } from './tasks/tasks.module.js';
 import { AdminModule } from './admin/admin.module.js';
 import { UserModule } from './user/user.module.js';
+import { CampaignModule } from './campaign/campaign.module.js';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { UserModule } from './user/user.module.js';
     TasksModule,
     AdminModule,
     UserModule,
+    CampaignModule,
   ],
   controllers: [AppController],
   providers: [AppService],
