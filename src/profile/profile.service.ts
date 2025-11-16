@@ -1,12 +1,13 @@
 import { Injectable, Logger, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreatePlayerProfileDto, CreateClubProfileDto, CreateCoachProfileDto, CreateFanProfileDto, UpdatePlayerProfileDto } from './dto/index.js';
+import { BlockchainService } from '../blockchain/blockchain.service.js';
 
 @Injectable()
 export class ProfileService {
   private readonly logger = new Logger(ProfileService.name);
 
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService, private blockchain: BlockchainService) { }
 
   // ============================================
   // PLAYER PROFILE
@@ -40,6 +41,26 @@ export class ProfileService {
     });
 
     this.logger.log(`Player profile created for user ${userId}`);
+
+    // Try to deploy PlayerNFT and transfer ownership to the player's Polkadot wallet
+    try {
+      const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { wallets: true } });
+      const targetWallet = user?.wallets?.find((w) => w.network?.toLowerCase().includes('polkadot')) ||
+        user?.wallets?.find((w) => w.isDefault) || user?.wallets?.[0];
+
+      if (targetWallet && targetWallet.address) {
+        const { address, contract } = await this.blockchain.deployPlayerNFT();
+        await this.blockchain.transferOwnership(contract, targetWallet.address);
+        await this.prisma.playerProfile.update({ where: { userId }, data: { contractAddress: address } });
+        this.logger.log(`PlayerNFT deployed at ${address} and ownership transferred to ${targetWallet.address}`);
+        return await this.prisma.playerProfile.findUnique({ where: { userId } });
+      } else {
+        this.logger.log('No target wallet found for player; PlayerNFT deployed but ownership retained by deployer.');
+      }
+    } catch (err) {
+      this.logger.error('Error deploying/transferring PlayerNFT', err as any);
+    }
+
     return profile;
   }
 
@@ -169,6 +190,28 @@ export class ProfileService {
     });
 
     this.logger.log(`Club profile created for user ${userId}: ${dto.clubName}`);
+
+    // Try to deploy ClubToken and transfer ownership to the club's Polkadot wallet
+    try {
+      const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { wallets: true } });
+      const targetWallet = user?.wallets?.find((w) => w.network?.toLowerCase().includes('polkadot')) ||
+        user?.wallets?.find((w) => w.isDefault) || user?.wallets?.[0];
+
+      const { address, contract } = await this.blockchain.deployClubToken(dto.clubName, dto.tokenSymbol, undefined);
+
+      if (targetWallet && targetWallet.address) {
+        await this.blockchain.transferOwnership(contract, targetWallet.address);
+        this.logger.log(`ClubToken deployed at ${address} and ownership transferred to ${targetWallet.address}`);
+      } else {
+        this.logger.log('No target wallet found for club; ClubToken deployed but ownership retained by deployer.');
+      }
+
+      // Update DB with token address and default token supply
+      await this.prisma.clubProfile.update({ where: { userId }, data: { tokenAddress: address, tokenSupply: '1000000' } });
+    } catch (err) {
+      this.logger.error('Error deploying/transferring ClubToken', err as any);
+    }
+
     return profile;
   }
 
