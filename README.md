@@ -1,3 +1,11 @@
+# Frontend Link
+
+https://github.com/Emanuel250YT/OpenLeague-Frontend
+
+# CDN LINK
+
+https://github.com/Emanuel250YT/arka-cdn
+
 # OpenLeague Backend
 
 Backend en NestJS con soporte para Prisma (ORM), Hardhat (Smart Contracts) y Arka CDN (Almacenamiento Descentralizado).
@@ -478,6 +486,162 @@ El contrato `TournamentManager` incluye:
 
 MIT
 
-## 👨‍💻 Autor
+MILESTONE 2 PLAN — Open League
+The future of discovery, scouting & player growth for amateur football worldwide.
 
-Tu nombre aquí
+Team: Mariano Velarde & Emanuel Guzmán
+Track: ✔ SHIP-A-TON
+Date: Noviembre 2025
+
+📍 WHERE WE ARE NOW
+What we built/validated this weekend
+
+Validamos el concepto central: un sistema de retos + videos + ranking que permite que jugadores amateurs puedan mostrar su progreso y tener visibilidad global.
+
+Creamos las primeras pantallas funcionales usando IA para acelerar producción y tener un MVP visualizable.
+
+Probamos el concepto con lapachanga.club, una comunidad real de jugadores casuales y amateurs que confirmaron el entusiasmo por la gamificación y el progreso visible.
+
+Probamos el flujo básico de carga de videos, validamos que el proceso es intuitivo y atractivo para jugadores jóvenes.
+
+What's working
+
+La gamificación genera una respuesta muy fuerte: los jugadores quieren mejorar, avanzar en rankings y cumplir retos.
+
+El enfoque de progreso individual (tipo “camino a profesional”) resuena profundamente en comunidades amateurs.
+
+El contenido generado por usuarios (UGC) funciona muy bien con creadores de contenido de fútbol (potencial de virales).
+
+El MVP es viable sin diseño final gracias al uso de IA + arquitectura clara.
+
+What still needs work
+
+Diseño y UX profesional (estaba previsto realizarlo en Webflow, pero lo pospusimos por tiempo).
+
+Afinar el sistema de retos con apoyo experto (coaches, clubes, entrenadores profesionales).
+
+Refinar el onboarding de marcas, clubes y socios.
+
+Definir criterios justos y transparentes para scoring, clasificación y ranking de videos.
+
+Establecer el marco legal para donaciones, pagos y contratos (internacionales).
+
+Blockers or hurdles we hit
+
+Falta de tiempo para diseño visual avanzado.
+
+Limitaciones para integrar Webflow en esta etapa.
+
+Necesidad de una estructura legal sólida debido a la naturaleza internacional del modelo.
+
+Necesidad de apoyo experto para tokenomics (esperamos obtenerlo con Polkadot).
+
+🚀 WHAT WE'LL SHIP IN 30 DAYS
+Our MVP will do this
+
+Open League permitirá que jugadores amateurs suban videos cumpliendo retos deportivos, reciban puntuaciones y compitan en rankings visibles por clubes, marcas y creadores.
+A su vez, permitirá que clubes y patrocinadores descubran talento emergente y puedan apoyarlos económicamente a través de donaciones o pequeños contratos iniciales.
+El MVP demostrará un “player-to-world showcase” funcional con scoring y retos activos.
+
+⚙ Features We'll Build (3–5 MAX)
+Week 1–2
+Feature: Onboarding de jugadores + perfiles + carga de videos
+
+Why it matters: es el corazón del MVP; necesitamos que los jugadores puedan comenzar su camino, documentar su progreso y generar material para ranking.
+Who builds it: Emanuel Guzmán.
+
+Feature: Sistema inicial de retos dinámicos (con expiración, reintentos y registro histórico)
+
+Why it matters: Los retos son el método principal para medir progreso real; permiten retener usuarios y atraer creadores de contenido.
+Who builds it: Emanuel Guzmán.
+
+Week 2–3
+Feature: Sistema de scoring + ranking visible
+
+Why it matters: Permite que el ecosistema funcione como “liga abierta mundial". Es lo que vuelve adictiva la experiencia.
+Who builds it: Emanuel Guzmán, con validación externa de entrenadores y clubes.
+
+Feature: Inicio de onboarding para marcas y clubes
+
+Why it matters: Abrimos la puerta a patrocinios reales, donaciones y oportunidades de scouting.
+Who builds it: Mariano Velarde (relaciones + negociación).
+
+Week 3–4
+Feature: Integración legal y financiera básica (donaciones, contratos iniciales)
+
+Why it matters: Necesitamos procesar transacciones legales e internacionales.
+Who builds it: Mariano Velarde + equipo legal externo (a confirmar).
+
+Feature: Panel interno para validar y moderar videos
+
+Why it matters: Garantiza fairness, combate contenido fraudulento y protege la reputación del piloto.
+Who builds it: Emanuel Guzmán.
+
+👥 Team Breakdown
+Mariano Velarde — CEO / BizDev / Community Lead | 10–20 hrs/semana
+
+Fundador de lapachanga.club, comunidad real de jugadores amateurs.
+
+Dueño de una red activa dentro del ecosistema del fútbol amateur y profesional.
+
+Responsable de alianzas estratégicas (clubes profesionales, academias, marcas deportivas).
+
+Gestionará contactos con iniciativas como Copa Potrero, influencers, academias y sponsors.
+
+Emanuel Guzmán — CTO / Tech Lead | 10–15 hrs/semana
+
+Desarrollador para la Escuela de Fútbol de River Plate en Salta.
+
+Con experiencia en Web3 y sistemas de evaluación/deportivos.
+
+Responsable de arquitectura, desarrollo del MVP, base de datos, retos y scoring.
+
+Coordina tokenomics con mentores de Polkadot.
+
+🧠 Mentoring & Expertise We Need
+Areas where we need support
+
+Marco legal y compliance para contratos internacionales y donaciones.
+
+Estructura financiera Web3 confiable y auditada.
+
+UX avanzado para escalar fuera del MVP.
+
+Specific expertise we're looking for
+
+Asesoría en Tokenomics con Polkadot (modelo sostenible y escalable).
+
+Asesores deportivos profesionales para calibrar retos y métricas.
+
+Mentoría en escalado de plataformas UGC para comunidades masivas.
+
+🎯 WHAT HAPPENS AFTER
+When M2 is done, we plan to…
+
+Lanzar el MVP público para los primeros 100 jugadores reales antes del fin del mes.
+
+Activar campañas virales con creadores de contenido de fútbol (reacciones a jugadores).
+
+Abrir nuestro primer pipeline de scouting con clubes y academias ya en contacto.
+
+Comenzar negociaciones con sponsors para financiar los primeros desafíos y premios.
+
+And 6 months out we see our project achieve…
+
+Tener una estructura legal completa y una empresa constituida.
+
+Conseguir nuestro primer jugador contratado o becado gracias a Open League.
+
+Establecer alianzas con clubes medianos y grandes (tenemos contactos activos).
+
+Ser adoptados por creadores de contenido (los más grandes reaccionan a talento; esto amplifica 1 jugador → millones de vistas).
+
+Incorporar tokenomics optimizados con Polkadot para recompensas, transparencia y trazabilidad.
+
+Superar los 10.000 jugadores registrados y tener un ecosistema activo, con retos, ranking y scouting real.
+
+🏁 Open League: una liga abierta al mundo
+
+Construimos una herramienta que permite que cualquier jugador, desde cualquier potrero, pueda competir, progresar y ser visto.
+Creemos en el talento oculto.
+Y estamos construyendo la plataforma que lo va a revelar
