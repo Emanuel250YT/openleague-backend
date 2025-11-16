@@ -204,6 +204,15 @@ model PlayerProfile {
   statistics      Json? // Estadísticas del jugador
   achievements    Json? // Logros y premios
   isVerified      Boolean   @default(false)
+
+  currentLevel    PlayerLevel @default(BASE)
+  olIndexOverall  Int         @default(0) // 0-100
+  olIndexTechnical Int        @default(0) // 0-100
+  olIndexPhysical  Int        @default(0) // 0-100
+  olIndexCommitment Int       @default(0) // 0-100
+  olIndexTransparency Int     @default(0) // 0-100
+  olIndexReputation  Int      @default(0) // 0-100
+  ratingSnapshots PlayerRatingSnapshot[]
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -211,6 +220,34 @@ model PlayerProfile {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("player_profiles")
+}
+
+// Enum de niveles del jugador
+enum PlayerLevel {
+  BASE
+  PRO
+  INVERTIBLE
+  CONTRACT
+}
+
+// Histórico de rating OL diario/por evento
+model PlayerRatingSnapshot {
+  id           String   @id @default(uuid())
+  date         DateTime @default(now())
+  source       String   @default("system") // "challenge", "training", "manual", etc.
+  technical    Int
+  physical     Int
+  commitment   Int
+  transparency Int
+  reputation   Int
+  overall      Int
+  createdAt    DateTime @default(now())
+
+  playerProfileId String
+  playerProfile   PlayerProfile @relation(fields: [playerProfileId], references: [id], onDelete: Cascade)
+
+  @@index([playerProfileId, date])
+  @@map("player_rating_snapshots")
 }
 
 model ClubProfile {
