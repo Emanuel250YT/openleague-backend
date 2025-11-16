@@ -2,6 +2,8 @@
 
 Backend en NestJS con soporte para Prisma (ORM), Hardhat (Smart Contracts) y Arka CDN (Almacenamiento Descentralizado).
 
+> 📚 **Índice completo de documentación:** Ver [DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md)
+
 ## 🚀 Características
 
 - **NestJS**: Framework progresivo de Node.js para aplicaciones server-side
@@ -12,6 +14,10 @@ Backend en NestJS con soporte para Prisma (ORM), Hardhat (Smart Contracts) y Ark
 - **Autenticación JWT**: Sistema completo de auth con tokens revocables
 - **Multi-Wallet**: Soporte para vincular múltiples wallets (Ethereum, Polygon, BSC, etc.)
 - **Login con Wallet**: Autenticación con wallet + OTP por email
+- **Sistema de Perfiles**: Perfiles para jugadores, clubes, entrenadores y fans
+- **Sistema de Notificaciones**: Notificaciones automáticas vinculadas a acciones relevantes
+- **Sistema de Retos**: Retos temporales con integración de Arka CDN y creación automática
+- **Tareas Programadas**: Cron jobs para gestión automática de retos y notificaciones
 - **Upload de Archivos**: Subida y gestión de archivos en blockchain
 - **Swagger**: Documentación interactiva de API REST
 - **TypeScript**: Tipado estático completo
@@ -156,6 +162,24 @@ openleague-backend/
 │   │   ├── upload.controller.ts
 │   │   ├── data.controller.ts
 │   │   └── upload.module.ts
+│   ├── notification/      # Módulo de notificaciones
+│   │   ├── dto/
+│   │   ├── notification.controller.ts
+│   │   ├── notification.service.ts
+│   │   └── notification.module.ts
+│   ├── challenge/         # Módulo de retos
+│   │   ├── dto/
+│   │   ├── challenge.controller.ts
+│   │   ├── challenge.service.ts
+│   │   └── challenge.module.ts
+│   ├── tasks/             # Módulo de tareas programadas
+│   │   ├── tasks.service.ts
+│   │   └── tasks.module.ts
+│   ├── profile/           # Módulo de perfiles
+│   │   ├── dto/
+│   │   ├── profile.controller.ts
+│   │   ├── profile.service.ts
+│   │   └── profile.module.ts
 │   ├── email/             # Módulo de email
 │   │   ├── email.module.ts
 │   │   └── email.service.ts
@@ -173,12 +197,16 @@ openleague-backend/
 │   └── main.ts
 ├── hardhat.config.ts      # Configuración de Hardhat
 ├── AUTH_SYSTEM.md         # Documentación del sistema de autenticación
+├── NOTIFICATIONS_AND_CHALLENGES.md  # Documentación de notificaciones y retos
+├── PROFILES_SYSTEM.md     # Documentación del sistema de perfiles
 ├── QUICK_START.md         # Guía de inicio rápido
 ├── package.json
 └── tsconfig.json
 ```
 
 ## 📡 API Endpoints
+
+> 📖 **Referencia completa de API:** Ver [API_REFERENCE.md](./API_REFERENCE.md) - Documentación detallada de todos los endpoints (60+)
 
 ### General
 
@@ -227,7 +255,68 @@ openleague-backend/
 - `GET /api/blockchain/tournament/:id/participants` - Listar participantes
 - `POST /api/blockchain/tournament/:id/payout` - Pagar a ganadores
 
+### Notificaciones 🔔
+
+- `GET /api/notifications` - Obtener notificaciones del usuario (requiere JWT)
+  - Query params: `type`, `isRead`, `page`, `limit`
+- `GET /api/notifications/unread-count` - Contador de notificaciones no leídas (requiere JWT)
+- `GET /api/notifications/:id` - Obtener notificación específica (requiere JWT)
+- `PATCH /api/notifications/:id` - Marcar notificación como leída (requiere JWT)
+- `PATCH /api/notifications/mark-all/read` - Marcar todas como leídas (requiere JWT)
+- `DELETE /api/notifications/:id` - Eliminar notificación (requiere JWT)
+
+> 📖 **Documentación completa:** Ver [NOTIFICATIONS_AND_CHALLENGES.md](./NOTIFICATIONS_AND_CHALLENGES.md)
+
+### Retos (Challenges) 🏆
+
+- `POST /api/challenges` - Crear reto (requiere JWT)
+- `GET /api/challenges` - Listar retos con filtros
+  - Query params: `status`, `difficulty`, `page`, `limit`
+- `GET /api/challenges/active` - Obtener retos activos
+- `GET /api/challenges/:id` - Obtener reto específico
+- `PATCH /api/challenges/:id` - Actualizar reto (requiere JWT)
+- `DELETE /api/challenges/:id` - Eliminar reto (requiere JWT)
+
+> 📖 **Documentación completa:** Ver [NOTIFICATIONS_AND_CHALLENGES.md](./NOTIFICATIONS_AND_CHALLENGES.md)
+
+### Participaciones (Challenge Submissions) 🎥
+
+- `POST /api/challenges/submissions` - Crear participación en reto (requiere JWT)
+- `GET /api/challenges/submissions/my` - Obtener mis participaciones (requiere JWT)
+- `GET /api/challenges/:id/submissions` - Obtener participaciones de un reto
+- `GET /api/challenges/submissions/:id` - Obtener participación específica (requiere JWT)
+- `PATCH /api/challenges/submissions/:id` - Actualizar participación (aprobar/rechazar) (requiere JWT)
+- `DELETE /api/challenges/submissions/:id` - Eliminar participación (requiere JWT)
+
+> 📖 **Documentación completa:** Ver [NOTIFICATIONS_AND_CHALLENGES.md](./NOTIFICATIONS_AND_CHALLENGES.md)
+
 ## 📚 Documentación Adicional
+
+### Sistema de Autenticación
+
+- **[AUTH_SYSTEM.md](AUTH_SYSTEM.md)** - Sistema completo de autenticación
+  - Registro y login con email/contraseña
+  - Login con wallet + OTP
+  - Gestión de múltiples wallets
+  - Tokens JWT revocables
+
+### Sistema de Perfiles
+
+- **[PROFILES_SYSTEM.md](PROFILES_SYSTEM.md)** - Sistema de perfiles
+  - Perfiles de jugadores (con NFTs)
+  - Perfiles de clubes (con tokens ERC20)
+  - Perfiles de entrenadores
+  - Perfiles de fans
+
+### Sistema de Notificaciones y Retos
+
+- **[NOTIFICATIONS_AND_CHALLENGES.md](NOTIFICATIONS_AND_CHALLENGES.md)** - Documentación completa
+  - Sistema de notificaciones automáticas (12 tipos)
+  - Sistema de retos temporales (4 niveles de dificultad)
+  - Participaciones con videos de Arka CDN
+  - Tareas programadas (cron jobs)
+- **[TESTING_COMMANDS.md](TESTING_COMMANDS.md)** - Comandos para testing
+- **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - Resumen de implementación
 
 ### Arka CDN Integration
 
@@ -236,7 +325,6 @@ Para documentación completa sobre la integración de Arka CDN:
 - **[QUICK_START.md](QUICK_START.md)** - Guía rápida de configuración (5 minutos)
 - **[ARKA_CDN_INTEGRATION.md](ARKA_CDN_INTEGRATION.md)** - Documentación completa de la API
 - **[FRONTEND_EXAMPLES.md](FRONTEND_EXAMPLES.md)** - Ejemplos listos para frontend
-- **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - Resumen de implementación
 
 ### Características de Arka CDN
 
@@ -319,6 +407,47 @@ curl -X POST http://localhost:3000/api/users \
     "name": "Player One",
     "walletAddress": "0x..."
   }'
+```
+
+### Obtener notificaciones del usuario
+
+```bash
+# Obtener todas las notificaciones no leídas
+curl -X GET "http://localhost:3000/api/notifications?isRead=false" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+# Marcar todas como leídas
+curl -X PATCH http://localhost:3000/api/notifications/mark-all/read \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+### Ver retos activos y participar
+
+```bash
+# 1. Ver retos activos
+curl -X GET http://localhost:3000/api/challenges/active
+
+# 2. Subir video para participación
+curl -X POST http://localhost:3000/api/upload/file \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -F "file=@video.mp4" \
+  -F "description=Mi participación" \
+  -F "compress=true"
+
+# 3. Crear participación en el reto
+curl -X POST http://localhost:3000/api/challenges/submissions \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "challengeId": "uuid-del-reto",
+    "arkaFileId": "uuid-del-video",
+    "videoUrl": "https://arka-cdn.com/...",
+    "description": "Mi mejor regate"
+  }'
+
+# 4. Ver mis participaciones
+curl -X GET http://localhost:3000/api/challenges/submissions/my \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 ## 🔐 Smart Contract
