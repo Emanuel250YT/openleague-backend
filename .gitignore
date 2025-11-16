@@ -49,3 +49,5 @@ typechain-types
 
 # Hardhat ignition
 ignition/deployments
+
+sdk
