@@ -222,7 +222,6 @@ model PlayerProfile {
   @@map("player_profiles")
 }
 
-// Enum de niveles del jugador
 enum PlayerLevel {
   BASE
   PRO
@@ -230,7 +229,6 @@ enum PlayerLevel {
   CONTRACT
 }
 
-// Histórico de rating OL diario/por evento
 model PlayerRatingSnapshot {
   id           String   @id @default(uuid())
   date         DateTime @default(now())
