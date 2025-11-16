@@ -89,6 +89,23 @@ export class UploadService implements OnModuleInit {
       },
       include: {
         chunks: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            wallets: {
+              select: {
+                id: true,
+                address: true,
+                network: true,
+                currency: true,
+                provider: true,
+                isDefault: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -106,6 +123,12 @@ export class UploadService implements OnModuleInit {
       chunks: savedFile.totalChunks,
       createdAt: savedFile.createdAt,
       expiresAt: savedFile.expiresAt,
+      user: {
+        id: savedFile.user.id,
+        email: savedFile.user.email,
+        name: savedFile.user.name,
+        wallets: savedFile.user.wallets,
+      },
     };
   }
 
@@ -141,6 +164,25 @@ export class UploadService implements OnModuleInit {
         progress: arkaData.status === 'completed' ? 100 : 0,
         userId,
       },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            wallets: {
+              select: {
+                id: true,
+                address: true,
+                network: true,
+                currency: true,
+                provider: true,
+                isDefault: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     this.logger.log(`Plain data saved to database: ${savedFile.id}`);
@@ -154,6 +196,12 @@ export class UploadService implements OnModuleInit {
       publicUrl: savedFile.publicUrl,
       status: savedFile.status,
       message: arkaData.message,
+      user: {
+        id: savedFile.user.id,
+        email: savedFile.user.email,
+        name: savedFile.user.name,
+        wallets: savedFile.user.wallets,
+      },
     };
   }
 
