@@ -29,14 +29,16 @@ model User {
 }
 
 model Wallet {
-  id        String   @id @default(uuid())
-  address   String   @unique
-  network   String // ethereum, polygon, bsc, etc.
-  currency  String // ETH, MATIC, BNB, etc.
-  provider  String // metamask, coinbase, walletconnect, open league, etc.
-  isDefault Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                String   @id @default(uuid())
+  address           String   @unique
+  network           String // ethereum, polygon, bsc, polkadot, etc.
+  currency          String // ETH, MATIC, BNB, DOT, etc.
+  provider          String // metamask, coinbase, walletconnect, open league, polkadot, etc.
+  isDefault         Boolean  @default(false)
+  encryptedJson     String? // JSON cifrado de la wallet (para Polkadot)
+  encryptedMnemonic String? // Mnemónico cifrado (para Polkadot)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)

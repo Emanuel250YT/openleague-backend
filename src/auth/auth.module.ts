@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller.js';
 import { JwtStrategy } from './strategies/jwt.strategy.js';
 import { PrismaModule } from '../prisma/prisma.module.js';
 import { EmailModule } from '../email/email.module.js';
+import { PolkadotWalletService } from './polkadot-wallet.service.js';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { EmailModule } from '../email/email.module.js';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
-  exports: [AuthService, JwtStrategy, PassportModule],
+  providers: [AuthService, JwtStrategy, PolkadotWalletService],
+  exports: [AuthService, JwtStrategy, PassportModule, PolkadotWalletService],
 })
 export class AuthModule { }
