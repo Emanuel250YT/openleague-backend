@@ -120,14 +120,26 @@ enum TournamentStatus {
 }
 
 model File {
-  id           String   @id @default(uuid())
-  originalName String
-  mimeType     String
-  size         Int
-  encoding     String   @default("base64")
-  arkivAddress String? // Dirección principal si el archivo es pequeño
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id             String     @id @default(uuid())
+  arkaFileId     String     @unique // UUID de Arka CDN
+  originalName   String
+  mimeType       String
+  size           Int
+  description    String?
+  publicUrl      String // URL pública del archivo
+  status         FileStatus @default(PENDING) // pending, processing, completed, failed
+  compressed     Boolean    @default(false)
+  isDashVideo    Boolean    @default(false)
+  totalChunks    Int        @default(0)
+  uploadedChunks Int        @default(0)
+  failedChunks   Int        @default(0)
+  progress       Int        @default(0)
+  lastError      String?
+  retryCount     Int        @default(0)
+  originalSize   Int? // Tamaño original antes de compresión
+  expiresAt      DateTime? // TTL del archivo
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -142,12 +154,21 @@ model FileChunk {
   chunkIndex   Int
   arkivAddress String
   size         Int
+  status       String   @default("pending") // pending, uploading, completed, failed
   txHash       String? // Transaction hash from Arkiv
   createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   fileId String
   file   File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
 
   @@unique([fileId, chunkIndex])
   @@map("file_chunks")
+}
+
+enum FileStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
 }

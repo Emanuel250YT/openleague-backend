@@ -1,6 +1,6 @@
 # OpenLeague Backend
 
-Backend en NestJS con soporte para Prisma (ORM) y Hardhat (Smart Contracts).
+Backend en NestJS con soporte para Prisma (ORM), Hardhat (Smart Contracts) y Arka CDN (Almacenamiento Descentralizado).
 
 ## 🚀 Características
 
@@ -8,9 +8,11 @@ Backend en NestJS con soporte para Prisma (ORM) y Hardhat (Smart Contracts).
 - **Prisma**: ORM moderno para TypeScript y Node.js
 - **Hardhat**: Entorno de desarrollo para Ethereum
 - **Smart Contracts**: Contrato TournamentManager para gestión de torneos on-chain
+- **Arka CDN**: Almacenamiento descentralizado en Arkiv Network
 - **Autenticación JWT**: Sistema completo de auth con tokens revocables
 - **Multi-Wallet**: Soporte para vincular múltiples wallets (Ethereum, Polygon, BSC, etc.)
 - **Login con Wallet**: Autenticación con wallet + OTP por email
+- **Upload de Archivos**: Subida y gestión de archivos en blockchain
 - **Swagger**: Documentación interactiva de API REST
 - **TypeScript**: Tipado estático completo
 - **Validación**: Class-validator para validación de DTOs
@@ -20,6 +22,7 @@ Backend en NestJS con soporte para Prisma (ORM) y Hardhat (Smart Contracts).
 - Node.js (v18 o superior)
 - PostgreSQL (para Prisma)
 - npm o yarn
+- Cuenta en Arka CDN (https://arkacdn.cloudycoding.com)
 
 ## 🛠️ Instalación
 
@@ -48,6 +51,8 @@ Edita el archivo `.env` con tus configuraciones:
 - `JWT_ACCESS_EXPIRATION`: Tiempo de expiración de access tokens (ej: "15m")
 - `JWT_REFRESH_EXPIRATION`: Tiempo de expiración de refresh tokens (ej: "7d")
 - `EMAIL_HOST`: Servidor SMTP (ej: "smtp.gmail.com")
+- `ARKA_CDN_EMAIL`: Email de tu cuenta en Arka CDN
+- `ARKA_CDN_PASSWORD`: Contraseña de tu cuenta en Arka CDN
 - `EMAIL_PORT`: Puerto SMTP (587)
 - `EMAIL_USER`: Tu email para enviar mensajes
 - `EMAIL_PASSWORD`: Contraseña de aplicación de Gmail
@@ -142,7 +147,15 @@ openleague-backend/
 │   │   ├── strategies/
 │   │   ├── auth.controller.ts
 │   │   ├── auth.module.ts
-│   │   └── auth.service.ts
+│   │   ├── auth.service.ts
+│   │   └── polkadot-wallet.service.ts
+│   ├── upload/            # Módulo de Arka CDN
+│   │   ├── dto/
+│   │   ├── arka-cdn.service.ts
+│   │   ├── upload.service.ts
+│   │   ├── upload.controller.ts
+│   │   ├── data.controller.ts
+│   │   └── upload.module.ts
 │   ├── email/             # Módulo de email
 │   │   ├── email.module.ts
 │   │   └── email.service.ts
@@ -194,6 +207,18 @@ openleague-backend/
 - `PATCH /api/users/:id` - Actualizar usuario
 - `DELETE /api/users/:id` - Eliminar usuario
 
+### Upload / Arka CDN
+
+- `POST /api/upload/file` - Subir archivo
+- `POST /api/upload/plain` - Subir texto/JSON
+- `GET /api/upload` - Listar archivos del usuario
+- `GET /api/upload/:id` - Obtener información del archivo
+- `GET /api/upload/:id/text` - Obtener contenido de texto
+- `GET /api/upload/:id/json` - Obtener y parsear JSON
+- `GET /api/upload/:id/status` - Obtener estado de subida
+- `DELETE /api/upload/:id` - Eliminar archivo
+- `GET /api/data/:uuid` - **Descargar archivo (público, sin auth)**
+
 ### Blockchain
 
 - `POST /api/blockchain/tournament` - Crear torneo on-chain
@@ -201,6 +226,28 @@ openleague-backend/
 - `POST /api/blockchain/tournament/:id/participant` - Agregar participante
 - `GET /api/blockchain/tournament/:id/participants` - Listar participantes
 - `POST /api/blockchain/tournament/:id/payout` - Pagar a ganadores
+
+## 📚 Documentación Adicional
+
+### Arka CDN Integration
+
+Para documentación completa sobre la integración de Arka CDN:
+
+- **[QUICK_START.md](QUICK_START.md)** - Guía rápida de configuración (5 minutos)
+- **[ARKA_CDN_INTEGRATION.md](ARKA_CDN_INTEGRATION.md)** - Documentación completa de la API
+- **[FRONTEND_EXAMPLES.md](FRONTEND_EXAMPLES.md)** - Ejemplos listos para frontend
+- **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - Resumen de implementación
+
+### Características de Arka CDN
+
+- ✅ Subida de archivos (imágenes, videos, documentos, texto, JSON)
+- ✅ Almacenamiento descentralizado en Arkiv Network
+- ✅ Compresión automática de imágenes y videos
+- ✅ División en chunks para archivos grandes
+- ✅ URLs públicas para compartir archivos
+- ✅ TTL configurable para archivos temporales
+- ✅ Seguimiento de estado de subida
+- ✅ Acceso público sin autenticación
 
 ## 🧪 Testing
 

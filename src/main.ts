@@ -25,13 +25,15 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('OpenLeague Backend API')
     .setDescription(
-      'API REST para gestión de torneos con integración blockchain (Hardhat) y base de datos (Prisma)',
+      'API REST para gestión de torneos con integración blockchain (Hardhat), base de datos (Prisma) y almacenamiento descentralizado (Arka CDN / Arkiv Network)',
     )
     .setVersion('1.0')
     .addTag('health', 'Health check endpoints')
     .addTag('auth', 'Autenticación y gestión de usuarios')
     .addTag('users', 'Gestión de usuarios')
     .addTag('blockchain', 'Interacción con smart contracts')
+    .addTag('upload', 'Subida y gestión de archivos en Arkiv Network')
+    .addTag('data', 'Acceso público a archivos (no requiere autenticación)')
     .addBearerAuth()
     .build();
 
