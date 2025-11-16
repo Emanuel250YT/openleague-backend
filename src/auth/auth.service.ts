@@ -90,7 +90,7 @@ export class AuthService {
     }
 
     // Generar tokens y retornar con el mnemónico (solo una vez)
-    const authResponse = this.generateAuthResponse(user);
+    const authResponse = await this.generateAuthResponse(user);
     return {
       ...authResponse,
       polkadotMnemonic: polkadotWallet.mnemonic,
