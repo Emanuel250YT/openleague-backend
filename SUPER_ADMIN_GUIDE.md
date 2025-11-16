@@ -62,7 +62,6 @@ import { Roles } from '../auth/decorators/roles.decorator';
 @Controller('admin-resource')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class AdminResourceController {
-  
   @Get()
   @Roles('ADMIN', 'SUPER_ADMIN')
   findAll() {
@@ -74,6 +73,7 @@ export class AdminResourceController {
 ### Decoradores Disponibles
 
 #### @SuperAdmin()
+
 Marca una ruta como accesible solo para super administradores:
 
 ```typescript
@@ -87,6 +87,7 @@ async getCriticalData() {
 ```
 
 #### @Roles(...roles)
+
 Marca una ruta como accesible para ciertos roles:
 
 ```typescript
@@ -104,6 +105,7 @@ async getAdminData() {
 ### Autenticación
 
 **Login del Super Admin:**
+
 ```bash
 POST /auth/login
 Content-Type: application/json
@@ -115,6 +117,7 @@ Content-Type: application/json
 ```
 
 **Respuesta:**
+
 ```json
 {
   "accessToken": "eyJhbGci...",
@@ -135,18 +138,21 @@ Content-Type: application/json
 Todos estos endpoints requieren autenticación con el token del super admin:
 
 #### Obtener Estadísticas del Sistema
+
 ```bash
 GET /admin/stats
 Authorization: Bearer {accessToken}
 ```
 
 #### Listar Todos los Usuarios
+
 ```bash
 GET /admin/users
 Authorization: Bearer {accessToken}
 ```
 
 #### Cambiar Rol de Usuario
+
 ```bash
 PUT /admin/users/{userId}/role
 Authorization: Bearer {accessToken}
@@ -158,24 +164,28 @@ Content-Type: application/json
 ```
 
 #### Verificar Usuario Manualmente
+
 ```bash
 POST /admin/users/{userId}/verify
 Authorization: Bearer {accessToken}
 ```
 
 #### Eliminar Usuario
+
 ```bash
 DELETE /admin/users/{userId}
 Authorization: Bearer {accessToken}
 ```
 
 #### Listar Todos los Torneos
+
 ```bash
 GET /admin/tournaments
 Authorization: Bearer {accessToken}
 ```
 
 #### Actualizar Estado de Torneo
+
 ```bash
 PUT /admin/tournaments/{tournamentId}/status
 Authorization: Bearer {accessToken}
@@ -201,7 +211,7 @@ export class CriticalService {
   async deleteCriticalData(id: string) {
     // Solo el super admin podrá ejecutar este método
     return this.prisma.criticalResource.delete({
-      where: { id }
+      where: { id },
     });
   }
 }
@@ -252,8 +262,8 @@ await prisma.user.update({
   where: { email: 'usuario@ejemplo.com' },
   data: {
     role: 'SUPER_ADMIN',
-    isSuperAdmin: true
-  }
+    isSuperAdmin: true,
+  },
 });
 ```
 

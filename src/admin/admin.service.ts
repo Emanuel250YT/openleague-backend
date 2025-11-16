@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service.js';
 
 @Injectable()
 export class AdminService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   /**
    * Obtener estadísticas del sistema (solo super admin)

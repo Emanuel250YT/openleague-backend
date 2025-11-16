@@ -11,15 +11,15 @@ datasource db {
 }
 
 model User {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  password    String
-  name        String?
-  isVerified  Boolean  @default(false)
-  role        UserRole @default(USER)
-  isSuperAdmin Boolean @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(uuid())
+  email        String   @unique
+  password     String
+  name         String?
+  isVerified   Boolean  @default(false)
+  role         UserRole @default(USER)
+  isSuperAdmin Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   tournaments          Tournament[]
   wallets              Wallet[]
@@ -215,16 +215,16 @@ model PlayerProfile {
   achievements    Json? // Logros y premios
   isVerified      Boolean   @default(false)
 
-  currentLevel    PlayerLevel @default(BASE)
-  olIndexOverall  Int         @default(0) // 0-100
-  olIndexTechnical Int        @default(0) // 0-100
-  olIndexPhysical  Int        @default(0) // 0-100
-  olIndexCommitment Int       @default(0) // 0-100
-  olIndexTransparency Int     @default(0) // 0-100
-  olIndexReputation  Int      @default(0) // 0-100
-  ratingSnapshots PlayerRatingSnapshot[]
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  currentLevel        PlayerLevel            @default(BASE)
+  olIndexOverall      Int                    @default(0) // 0-100
+  olIndexTechnical    Int                    @default(0) // 0-100
+  olIndexPhysical     Int                    @default(0) // 0-100
+  olIndexCommitment   Int                    @default(0) // 0-100
+  olIndexTransparency Int                    @default(0) // 0-100
+  olIndexReputation   Int                    @default(0) // 0-100
+  ratingSnapshots     PlayerRatingSnapshot[]
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
 
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)

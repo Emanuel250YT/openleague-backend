@@ -18,7 +18,7 @@ import { SuperAdminGuard } from '../auth/guards/super-admin.guard.js';
 @Controller('admin')
 @UseGuards(JwtAuthGuard, SuperAdminGuard)
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(private readonly adminService: AdminService) { }
 
   @Get('stats')
   @ApiOperation({ summary: 'Obtener estadísticas del sistema (Solo Super Admin)' })

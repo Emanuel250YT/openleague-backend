@@ -10,4 +10,4 @@ import { AuthModule } from '../auth/auth.module.js';
   providers: [AdminService],
   exports: [AdminService],
 })
-export class AdminModule {}
+export class AdminModule { }

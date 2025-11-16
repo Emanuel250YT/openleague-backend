@@ -73,7 +73,7 @@ export class AuthService implements OnModuleInit {
         if (!existingSuperAdmin.isSuperAdmin) {
           await this.prisma.user.update({
             where: { id: existingSuperAdmin.id },
-            data: { 
+            data: {
               isSuperAdmin: true,
               role: 'SUPER_ADMIN'
             },
@@ -87,7 +87,7 @@ export class AuthService implements OnModuleInit {
 
       // Crear el super admin
       const hashedPassword = await bcrypt.hash(superAdminPassword, 10);
-      
+
       // Crear Polkadot wallet para el super admin
       const polkadotWallet = await this.polkadotWalletService.createWallet(superAdminPassword);
       const encryptedMnemonic = await bcrypt.hash(polkadotWallet.mnemonic, 10);
