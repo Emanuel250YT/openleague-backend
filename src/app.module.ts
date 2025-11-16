@@ -11,6 +11,7 @@ import { NotificationModule } from './notification/notification.module.js';
 import { ChallengeModule } from './challenge/challenge.module.js';
 import { TasksModule } from './tasks/tasks.module.js';
 import { AdminModule } from './admin/admin.module.js';
+import { UserModule } from './user/user.module.js';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AdminModule } from './admin/admin.module.js';
     ChallengeModule,
     TasksModule,
     AdminModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
