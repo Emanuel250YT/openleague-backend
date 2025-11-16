@@ -112,6 +112,14 @@ export class ProfileController {
     return this.profileService.getPlayerRatingHistory(req.user.id, { from, to, limit: limit ? Number(limit) : undefined });
   }
 
+  @Get('player/score')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Puntaje actual del jugador para dashboard (overall, categoría, delta semanal, componentes)' })
+  async getPlayerScore(@Request() req) {
+    return this.profileService.getPlayerScore(req.user.id);
+  }
+
   @Get('players')
   @ApiOperation({ summary: 'Listar todos los jugadores' })
   @ApiQuery({ name: 'skip', required: false, type: Number, description: 'Número de registros a saltar' })
