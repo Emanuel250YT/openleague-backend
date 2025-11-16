@@ -35,6 +35,8 @@ async function bootstrap() {
     .addTag('notifications', '🔔 Sistema de notificaciones automáticas')
     .addTag('challenges', '🏆 Sistema de retos temporales')
     .addTag('submissions', '🎥 Participaciones en retos con videos')
+    .addTag('campaigns', '🎯 Sistema de campañas de jugadores')
+    .addTag('coupons', '🎟️ Sistema de cupones (Gas Sponsorship, File Upload, Premium)')
     .addTag('blockchain', 'Interacción con smart contracts')
     .addTag('upload', 'Subida y gestión de archivos en Arkiv Network')
     .addTag('data', 'Acceso público a archivos (no requiere autenticación)')

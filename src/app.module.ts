@@ -13,6 +13,7 @@ import { TasksModule } from './tasks/tasks.module.js';
 import { AdminModule } from './admin/admin.module.js';
 import { UserModule } from './user/user.module.js';
 import { CampaignModule } from './campaign/campaign.module.js';
+import { CouponModule } from './coupon/coupon.module.js';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { CampaignModule } from './campaign/campaign.module.js';
     AdminModule,
     UserModule,
     CampaignModule,
+    CouponModule,
   ],
   controllers: [AppController],
   providers: [AppService],
