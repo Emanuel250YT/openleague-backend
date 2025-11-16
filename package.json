@@ -5,7 +5,7 @@
   "author": "",
   "private": true,
   "license": "MIT",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -24,7 +24,8 @@
     "prisma:studio": "prisma studio",
     "hardhat:compile": "hardhat compile",
     "hardhat:test": "hardhat test",
-    "hardhat:deploy": "hardhat run scripts/deploy.ts"
+    "hardhat:deploy": "hardhat run scripts/deploy.ts",
+    "watch:deploy": "ts-node -T scripts/watch-and-deploy.ts"
   },
   "dependencies": {
     "@arkiv-network/sdk": "^0.4.4",

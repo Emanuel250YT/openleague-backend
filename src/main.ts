@@ -31,6 +31,7 @@ async function bootstrap() {
     .addTag('health', 'Health check endpoints')
     .addTag('auth', 'Autenticación y gestión de usuarios')
     .addTag('users', 'Gestión de usuarios')
+    .addTag('profiles', 'Gestión de perfiles (Jugador, Club, DT, Fan)')
     .addTag('blockchain', 'Interacción con smart contracts')
     .addTag('upload', 'Subida y gestión de archivos en Arkiv Network')
     .addTag('data', 'Acceso público a archivos (no requiere autenticación)')

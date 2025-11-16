@@ -21,6 +21,6 @@
     "resolveJsonModule": true,
     "esModuleInterop": true
   },
-  "include": ["src/**/*", "hardhat.config.ts", "scripts/**/*", "test/**/*", "examples/**/*"],
-  "exclude": ["node_modules", "dist", "test"]
+  "include": ["src/**/*", "hardhat.config.ts", "scripts/deploy*.ts", "test/**/*", "examples/**/*"],
+  "exclude": ["node_modules", "dist", "test", "scripts/interact-*.ts"]
 }

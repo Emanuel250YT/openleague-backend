@@ -23,10 +23,27 @@ const config: HardhatUserConfig = {
     },
     sepolia: {
       url: process.env.RPC_URL || 'https://eth-sepolia.g.alchemy.com/v2/demo',
-      accounts:
-        process.env.PRIVATE_KEY && process.env.PRIVATE_KEY.length === 66
-          ? [process.env.PRIVATE_KEY]
-          : [],
+      accounts: ((): string[] => {
+        const pk = process.env.PRIVATE_KEY || '';
+        if (!pk) return [];
+        if (pk.length === 66 && pk.startsWith('0x')) return [pk];
+        if (pk.length === 64) return [`0x${pk}`];
+        return [];
+      })(),
+    },
+    // Polkadot-compatible EVM parachain (e.g., Moonbase Alpha, Moonbeam, Astar).
+    // Set `POLKADOT_RPC_URL` and optional `POLKADOT_CHAIN_ID` in your .env before deploying.
+    polkadotEvm: {
+      // Default to Moonbase Alpha public RPC if POLKADOT_RPC_URL not provided
+      url: process.env.POLKADOT_RPC_URL || 'https://rpc.testnet.moonbeam.network',
+      chainId: process.env.POLKADOT_CHAIN_ID ? Number(process.env.POLKADOT_CHAIN_ID) : 1287,
+      accounts: ((): string[] => {
+        const pk = process.env.PRIVATE_KEY || '';
+        if (!pk) return [];
+        if (pk.length === 66 && pk.startsWith('0x')) return [pk];
+        if (pk.length === 64) return [`0x${pk}`];
+        return [];
+      })(),
     },
   },
   etherscan: {

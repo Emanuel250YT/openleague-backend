@@ -19,11 +19,15 @@ model User {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  tournaments Tournament[]
-  wallets     Wallet[]
-  tokens      Token[]
-  otpCodes    OtpCode[]
-  files       File[]
+  tournaments   Tournament[]
+  wallets       Wallet[]
+  tokens        Token[]
+  otpCodes      OtpCode[]
+  files         File[]
+  playerProfile PlayerProfile?
+  clubProfile   ClubProfile?
+  coachProfile  CoachProfile?
+  fanProfile    FanProfile?
 
   @@map("users")
 }
@@ -171,4 +175,106 @@ enum FileStatus {
   PROCESSING
   COMPLETED
   FAILED
+}
+
+// ============================================
+// SISTEMA DE PERFILES
+// ============================================
+
+enum ProfileType {
+  PLAYER
+  CLUB
+  COACH
+  FAN
+}
+
+model PlayerProfile {
+  id              String    @id @default(uuid())
+  displayName     String
+  position        String? // Delantero, Medio, Defensa, Portero
+  jerseyNumber    Int?
+  height          Float? // en cm
+  weight          Float? // en kg
+  dateOfBirth     DateTime?
+  nationality     String?
+  biography       String?
+  avatarUrl       String?
+  nftTokenId      String? // Token ID del NFT del jugador
+  contractAddress String? // Dirección del contrato del NFT
+  statistics      Json? // Estadísticas del jugador
+  achievements    Json? // Logros y premios
+  isVerified      Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("player_profiles")
+}
+
+model ClubProfile {
+  id           String   @id @default(uuid())
+  clubName     String   @unique
+  shortName    String? // Nombre corto/siglas
+  foundedYear  Int?
+  country      String?
+  city         String?
+  stadium      String?
+  description  String?
+  logoUrl      String?
+  bannerUrl    String?
+  tokenSymbol  String   @unique // Símbolo del token ERC20
+  tokenName    String // Nombre del token
+  tokenAddress String?  @unique // Dirección del contrato ERC20
+  tokenSupply  String? // Supply total del token
+  socialLinks  Json? // Twitter, Instagram, TikTok, etc.
+  isVerified   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("club_profiles")
+}
+
+model CoachProfile {
+  id              String    @id @default(uuid())
+  displayName     String
+  specialty       String? // Técnico, Físico, Porteros, etc.
+  licenseLevel    String? // UEFA Pro, A, B, C
+  yearsExperience Int?
+  dateOfBirth     DateTime?
+  nationality     String?
+  biography       String?
+  avatarUrl       String?
+  achievements    Json? // Equipos dirigidos, títulos, etc.
+  isVerified      Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("coach_profiles")
+}
+
+model FanProfile {
+  id             String   @id @default(uuid())
+  displayName    String
+  favoriteClub   String?
+  favoritePlayer String?
+  country        String?
+  avatarUrl      String?
+  biography      String?
+  loyaltyPoints  Int      @default(0)
+  nftCollection  Json? // NFTs coleccionados
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("fan_profiles")
 }
