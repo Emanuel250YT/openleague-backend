@@ -42,21 +42,24 @@ export class ProfileService {
 
     this.logger.log(`Player profile created for user ${userId}`);
 
-    // Try to deploy PlayerNFT and transfer ownership to the player's Polkadot wallet
+    // Try to deploy PlayerNFT and transfer ownership to the player's EVM wallet
     try {
       const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { wallets: true } });
-      const targetWallet = user?.wallets?.find((w) => w.network?.toLowerCase().includes('polkadot')) ||
-        user?.wallets?.find((w) => w.isDefault) || user?.wallets?.[0];
+      // Find EVM-compatible wallet (address starts with 0x)
+      const targetWallet = user?.wallets?.find((w) => w.address?.startsWith('0x')) ||
+        user?.wallets?.find((w) => w.isDefault && w.address?.startsWith('0x'));
 
-      if (targetWallet && targetWallet.address) {
-        const { address, contract } = await this.blockchain.deployPlayerNFT();
+      const { address, contract } = await this.blockchain.deployPlayerNFT();
+      await this.prisma.playerProfile.update({ where: { userId }, data: { contractAddress: address } });
+
+      if (targetWallet && targetWallet.address && targetWallet.address.startsWith('0x')) {
         await this.blockchain.transferOwnership(contract, targetWallet.address);
-        await this.prisma.playerProfile.update({ where: { userId }, data: { contractAddress: address } });
         this.logger.log(`PlayerNFT deployed at ${address} and ownership transferred to ${targetWallet.address}`);
-        return await this.prisma.playerProfile.findUnique({ where: { userId } });
       } else {
-        this.logger.log('No target wallet found for player; PlayerNFT deployed but ownership retained by deployer.');
+        this.logger.log(`PlayerNFT deployed at ${address}. No EVM wallet found - ownership retained by deployer.`);
       }
+
+      return await this.prisma.playerProfile.findUnique({ where: { userId } });
     } catch (err) {
       this.logger.error('Error deploying/transferring PlayerNFT', err as any);
     }
@@ -191,23 +194,22 @@ export class ProfileService {
 
     this.logger.log(`Club profile created for user ${userId}: ${dto.clubName}`);
 
-    // Try to deploy ClubToken and transfer ownership to the club's Polkadot wallet
+    // Try to deploy ClubToken and transfer ownership to the club's EVM wallet
     try {
       const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { wallets: true } });
-      const targetWallet = user?.wallets?.find((w) => w.network?.toLowerCase().includes('polkadot')) ||
-        user?.wallets?.find((w) => w.isDefault) || user?.wallets?.[0];
+      // Find EVM-compatible wallet (address starts with 0x)
+      const targetWallet = user?.wallets?.find((w) => w.address?.startsWith('0x')) ||
+        user?.wallets?.find((w) => w.isDefault && w.address?.startsWith('0x'));
 
       const { address, contract } = await this.blockchain.deployClubToken(dto.clubName, dto.tokenSymbol, undefined);
+      await this.prisma.clubProfile.update({ where: { userId }, data: { tokenAddress: address, tokenSupply: '1000000' } });
 
-      if (targetWallet && targetWallet.address) {
+      if (targetWallet && targetWallet.address && targetWallet.address.startsWith('0x')) {
         await this.blockchain.transferOwnership(contract, targetWallet.address);
         this.logger.log(`ClubToken deployed at ${address} and ownership transferred to ${targetWallet.address}`);
       } else {
-        this.logger.log('No target wallet found for club; ClubToken deployed but ownership retained by deployer.');
+        this.logger.log(`ClubToken deployed at ${address}. No EVM wallet found - ownership retained by deployer.`);
       }
-
-      // Update DB with token address and default token supply
-      await this.prisma.clubProfile.update({ where: { userId }, data: { tokenAddress: address, tokenSupply: '1000000' } });
     } catch (err) {
       this.logger.error('Error deploying/transferring ClubToken', err as any);
     }

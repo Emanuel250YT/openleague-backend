@@ -58,8 +58,9 @@ export class BlockchainService {
       const contract = await factory.deploy(clubName, tokenSymbol, initialSupply);
       await contract.waitForDeployment();
 
-      this.logger.log(`ClubToken deployed at ${contract.target}`);
-      return { address: contract.target, contract };
+      const address = typeof contract.target === 'string' ? contract.target : contract.target.toString();
+      this.logger.log(`ClubToken deployed at ${address}`);
+      return { address, contract: contract as ethers.Contract };
     } catch (error) {
       this.logger.error('deployClubToken error', error as any);
       throw new InternalServerErrorException('Failed to deploy ClubToken');
@@ -76,8 +77,9 @@ export class BlockchainService {
       const contract = await factory.deploy();
       await contract.waitForDeployment();
 
-      this.logger.log(`PlayerNFT deployed at ${contract.target}`);
-      return { address: contract.target, contract };
+      const address = typeof contract.target === 'string' ? contract.target : contract.target.toString();
+      this.logger.log(`PlayerNFT deployed at ${address}`);
+      return { address, contract: contract as ethers.Contract };
     } catch (error) {
       this.logger.error('deployPlayerNFT error', error as any);
       throw new InternalServerErrorException('Failed to deploy PlayerNFT');
@@ -86,7 +88,13 @@ export class BlockchainService {
 
   async transferOwnership(contract: ethers.Contract, newOwner: string) {
     try {
-      this.logger.log(`Transferring ownership of ${contract.target} to ${newOwner}`);
+      // Validate that newOwner is a valid Ethereum address
+      if (!ethers.isAddress(newOwner)) {
+        throw new Error(`Invalid address: ${newOwner}. Must be a valid Ethereum/EVM address starting with 0x`);
+      }
+
+      const contractAddress = typeof contract.target === 'string' ? contract.target : contract.target.toString();
+      this.logger.log(`Transferring ownership of ${contractAddress} to ${newOwner}`);
       const tx = await contract.transferOwnership(newOwner);
       // wait for tx
       if (tx && tx.wait) await tx.wait();

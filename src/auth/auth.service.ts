@@ -59,22 +59,35 @@ export class AuthService {
     // Encriptar el mnemónico con la contraseña del usuario
     const encryptedMnemonic = await bcrypt.hash(polkadotWallet.mnemonic, 10);
 
-    // Crear usuario con wallet de Polkadot
+    // Crear usuario con wallet de Polkadot Y wallet EVM
     const user = await this.prisma.user.create({
       data: {
         email,
         password: hashedPassword,
         name,
         wallets: {
-          create: {
-            address: polkadotWallet.address,
-            network: 'polkadot',
-            currency: 'DOT',
-            provider: 'polkadot',
-            isDefault: true,
-            encryptedJson: JSON.stringify(polkadotWallet.encryptedJson),
-            encryptedMnemonic: encryptedMnemonic,
-          },
+          create: [
+            {
+              // Wallet Polkadot nativa (substrate)
+              address: polkadotWallet.address,
+              network: 'polkadot',
+              currency: 'DOT',
+              provider: 'polkadot',
+              isDefault: false,
+              encryptedJson: JSON.stringify(polkadotWallet.encryptedJson),
+              encryptedMnemonic: encryptedMnemonic,
+            },
+            {
+              // Wallet EVM compatible (Moonbeam/Moonbase) - misma seed phrase
+              address: polkadotWallet.evmAddress,
+              network: 'moonbeam',
+              currency: 'GLMR',
+              provider: 'moonbeam-evm',
+              isDefault: true, // Esta será la default para deploys en Moonbase
+              encryptedJson: null,
+              encryptedMnemonic: encryptedMnemonic,
+            },
+          ],
         },
       },
       include: {
