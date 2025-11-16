@@ -121,22 +121,44 @@ export class ArkaCDNService {
    */
   async login(email: string, password: string): Promise<string> {
     try {
+      this.logger.log(`Attempting to login to Arka CDN with email: ${email}`);
+
       const response = await fetch(`${this.baseUrl}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
+      const responseText = await response.text();
+      this.logger.debug(`Response status: ${response.status}, body: ${responseText}`);
+
       if (!response.ok) {
-        throw new BadRequestException('Failed to login to Arka CDN');
+        let errorMessage = `Failed to login to Arka CDN (${response.status})`;
+        try {
+          const errorData = JSON.parse(responseText);
+          errorMessage = errorData.message || errorMessage;
+          this.logger.error(`Arka CDN login error: ${JSON.stringify(errorData)}`);
+        } catch {
+          this.logger.error(`Arka CDN login error: ${responseText}`);
+        }
+        throw new BadRequestException(errorMessage);
       }
 
-      const data = await response.json();
+      const data = JSON.parse(responseText);
+      if (!data.accessToken) {
+        this.logger.error('No access token in response:', data);
+        throw new BadRequestException('No access token received from Arka CDN');
+      }
+
       this.accessToken = data.accessToken;
+      this.logger.log('Successfully authenticated with Arka CDN');
       return this.accessToken;
     } catch (error) {
-      this.logger.error('Login error:', error);
-      throw new BadRequestException('Failed to authenticate with Arka CDN');
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      this.logger.error('Login error:', error.message || error);
+      throw new BadRequestException(`Failed to authenticate with Arka CDN: ${error.message || 'Unknown error'}`);
     }
   }
 
@@ -145,22 +167,44 @@ export class ArkaCDNService {
    */
   async loginWithWallet(walletAddress: string): Promise<string> {
     try {
+      this.logger.log(`Attempting to login to Arka CDN with wallet: ${walletAddress}`);
+
       const response = await fetch(`${this.baseUrl}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ walletAddress }),
       });
 
+      const responseText = await response.text();
+      this.logger.debug(`Response status: ${response.status}, body: ${responseText}`);
+
       if (!response.ok) {
-        throw new BadRequestException('Failed to login to Arka CDN with wallet');
+        let errorMessage = `Failed to login to Arka CDN with wallet (${response.status})`;
+        try {
+          const errorData = JSON.parse(responseText);
+          errorMessage = errorData.message || errorMessage;
+          this.logger.error(`Arka CDN wallet login error: ${JSON.stringify(errorData)}`);
+        } catch {
+          this.logger.error(`Arka CDN wallet login error: ${responseText}`);
+        }
+        throw new BadRequestException(errorMessage);
       }
 
-      const data = await response.json();
+      const data = JSON.parse(responseText);
+      if (!data.accessToken) {
+        this.logger.error('No access token in response:', data);
+        throw new BadRequestException('No access token received from Arka CDN');
+      }
+
       this.accessToken = data.accessToken;
+      this.logger.log('Successfully authenticated with Arka CDN using wallet');
       return this.accessToken;
     } catch (error) {
-      this.logger.error('Wallet login error:', error);
-      throw new BadRequestException('Failed to authenticate with Arka CDN using wallet');
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      this.logger.error('Wallet login error:', error.message || error);
+      throw new BadRequestException(`Failed to authenticate with Arka CDN using wallet: ${error.message || 'Unknown error'}`);
     }
   }
 
