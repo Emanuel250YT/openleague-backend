@@ -40,10 +40,12 @@ export class CampaignService {
         photoUrl: createDto.photoUrl,
         presentationVideo: createDto.presentationVideo,
         olRating: createDto.olRating,
-        sportingGoals: createDto.sportingGoals,
-        budget: createDto.budget,
-        timeline: createDto.timeline,
-        featuredChallenges: createDto.featuredChallenges || [],
+        sportingGoals: JSON.parse(JSON.stringify(createDto.sportingGoals)),
+        budget: JSON.parse(JSON.stringify(createDto.budget)),
+        timeline: JSON.parse(JSON.stringify(createDto.timeline)),
+        featuredChallenges: createDto.featuredChallenges
+          ? JSON.parse(JSON.stringify(createDto.featuredChallenges))
+          : [],
         startDate: createDto.startDate ? new Date(createDto.startDate) : null,
         endDate: createDto.endDate ? new Date(createDto.endDate) : null,
         playerId: createDto.playerId,
@@ -191,6 +193,20 @@ export class CampaignService {
     // Preparar datos para actualizar
     const updateData: any = { ...updateDto };
 
+    // Convertir DTOs a JSON plano
+    if (updateDto.sportingGoals) {
+      updateData.sportingGoals = JSON.parse(JSON.stringify(updateDto.sportingGoals));
+    }
+    if (updateDto.budget) {
+      updateData.budget = JSON.parse(JSON.stringify(updateDto.budget));
+    }
+    if (updateDto.timeline) {
+      updateData.timeline = JSON.parse(JSON.stringify(updateDto.timeline));
+    }
+    if (updateDto.featuredChallenges) {
+      updateData.featuredChallenges = JSON.parse(JSON.stringify(updateDto.featuredChallenges));
+    }
+
     // Convertir fechas si vienen en el DTO
     if (updateDto.startDate) {
       updateData.startDate = new Date(updateDto.startDate);
@@ -199,7 +215,7 @@ export class CampaignService {
       updateData.endDate = new Date(updateDto.endDate);
     }
 
-    // Eliminar playerId del updateData si existe (no se debe cambiar)
+    // Eliminar playerId del updateData si existe (no se debe changiar)
     delete updateData.playerId;
 
     return this.prisma.playerCampaign.update({
