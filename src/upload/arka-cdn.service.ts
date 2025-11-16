@@ -1,5 +1,6 @@
 import { Injectable, Logger, BadRequestException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import axios, { AxiosInstance } from 'axios';
 
 interface ArkaCDNUploadResponse {
   success: boolean;
@@ -113,8 +114,34 @@ export class ArkaCDNService {
   private readonly logger = new Logger(ArkaCDNService.name);
   private readonly baseUrl = 'https://arkacdn.cloudycoding.com/api';
   private accessToken: string | null = null;
+  private readonly httpClient: AxiosInstance;
 
-  constructor(private configService: ConfigService) { }
+  constructor(private configService: ConfigService) {
+    // Create axios instance with browser-like headers to bypass Cloudflare
+    this.httpClient = axios.create({
+      baseURL: this.baseUrl,
+      timeout: 30000,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Connection': 'keep-alive',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-origin',
+      },
+      withCredentials: true, // Enable cookie handling
+    });
+
+    // Add request interceptor to automatically include auth token
+    this.httpClient.interceptors.request.use((config) => {
+      if (this.accessToken && !config.headers.Authorization) {
+        config.headers.Authorization = `Bearer ${this.accessToken}`;
+      }
+      return config;
+    });
+  }
 
   /**
    * Login to Arka CDN and get access token
@@ -123,40 +150,34 @@ export class ArkaCDNService {
     try {
       this.logger.log(`Attempting to login to Arka CDN with email: ${email}`);
 
-      const response = await fetch(`${this.baseUrl}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+      const response = await this.httpClient.post('/auth/login', {
+        email,
+        password,
       });
 
-      const responseText = await response.text();
-      this.logger.debug(`Response status: ${response.status}, body: ${responseText}`);
+      this.logger.debug(`Response status: ${response.status}, body: ${JSON.stringify(response.data)}`);
 
-      if (!response.ok) {
-        let errorMessage = `Failed to login to Arka CDN (${response.status})`;
-        try {
-          const errorData = JSON.parse(responseText);
-          errorMessage = errorData.message || errorMessage;
-          this.logger.error(`Arka CDN login error: ${JSON.stringify(errorData)}`);
-        } catch {
-          this.logger.error(`Arka CDN login error: ${responseText}`);
-        }
-        throw new BadRequestException(errorMessage);
-      }
-
-      const data = JSON.parse(responseText);
-      if (!data.accessToken) {
-        this.logger.error('No access token in response:', data);
+      if (!response.data.accessToken) {
+        this.logger.error('No access token in response:', response.data);
         throw new BadRequestException('No access token received from Arka CDN');
       }
 
-      this.accessToken = data.accessToken;
+      this.accessToken = response.data.accessToken;
       this.logger.log('Successfully authenticated with Arka CDN');
       return this.accessToken;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
       }
+
+      // Handle axios errors
+      if (error.response) {
+        const status = error.response.status;
+        const data = error.response.data;
+        this.logger.error(`Arka CDN login error (${status}):`, typeof data === 'string' ? data.substring(0, 200) : JSON.stringify(data));
+        throw new BadRequestException(`Failed to login to Arka CDN (${status}): ${data?.message || 'Cloudflare protection or authentication failed'}`);
+      }
+
       this.logger.error('Login error:', error.message || error);
       throw new BadRequestException(`Failed to authenticate with Arka CDN: ${error.message || 'Unknown error'}`);
     }
@@ -169,40 +190,33 @@ export class ArkaCDNService {
     try {
       this.logger.log(`Attempting to login to Arka CDN with wallet: ${walletAddress}`);
 
-      const response = await fetch(`${this.baseUrl}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ walletAddress }),
+      const response = await this.httpClient.post('/auth/login', {
+        walletAddress,
       });
 
-      const responseText = await response.text();
-      this.logger.debug(`Response status: ${response.status}, body: ${responseText}`);
+      this.logger.debug(`Response status: ${response.status}, body: ${JSON.stringify(response.data)}`);
 
-      if (!response.ok) {
-        let errorMessage = `Failed to login to Arka CDN with wallet (${response.status})`;
-        try {
-          const errorData = JSON.parse(responseText);
-          errorMessage = errorData.message || errorMessage;
-          this.logger.error(`Arka CDN wallet login error: ${JSON.stringify(errorData)}`);
-        } catch {
-          this.logger.error(`Arka CDN wallet login error: ${responseText}`);
-        }
-        throw new BadRequestException(errorMessage);
-      }
-
-      const data = JSON.parse(responseText);
-      if (!data.accessToken) {
-        this.logger.error('No access token in response:', data);
+      if (!response.data.accessToken) {
+        this.logger.error('No access token in response:', response.data);
         throw new BadRequestException('No access token received from Arka CDN');
       }
 
-      this.accessToken = data.accessToken;
+      this.accessToken = response.data.accessToken;
       this.logger.log('Successfully authenticated with Arka CDN using wallet');
       return this.accessToken;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
       }
+
+      // Handle axios errors
+      if (error.response) {
+        const status = error.response.status;
+        const data = error.response.data;
+        this.logger.error(`Arka CDN wallet login error (${status}):`, typeof data === 'string' ? data.substring(0, 200) : JSON.stringify(data));
+        throw new BadRequestException(`Failed to login with wallet (${status}): ${data?.message || 'Cloudflare protection or authentication failed'}`);
+      }
+
       this.logger.error('Wallet login error:', error.message || error);
       throw new BadRequestException(`Failed to authenticate with Arka CDN using wallet: ${error.message || 'Unknown error'}`);
     }
@@ -259,23 +273,16 @@ export class ArkaCDNService {
         formData.append('ttl', options.ttl.toString());
       }
 
-      const response = await fetch(`${this.baseUrl}/upload/file`, {
-        method: 'POST',
+      const response = await this.httpClient.post('/upload/file', formData, {
         headers: {
-          Authorization: `Bearer ${this.accessToken}`,
+          'Content-Type': 'multipart/form-data',
         },
-        body: formData,
       });
 
-      if (!response.ok) {
-        const error = await response.text();
-        throw new BadRequestException(`Failed to upload file: ${error}`);
-      }
-
-      return await response.json();
+      return response.data;
     } catch (error) {
-      this.logger.error('Upload file error:', error);
-      throw new BadRequestException('Failed to upload file to Arka CDN');
+      this.logger.error('Upload file error:', error.response?.data || error.message);
+      throw new BadRequestException(`Failed to upload file to Arka CDN: ${error.response?.data?.message || error.message}`);
     }
   }
 
@@ -292,28 +299,16 @@ export class ArkaCDNService {
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}/upload/plain`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.accessToken}`,
-        },
-        body: JSON.stringify({
-          data,
-          filename,
-          description,
-        }),
+      const response = await this.httpClient.post('/upload/plain', {
+        data,
+        filename,
+        description,
       });
 
-      if (!response.ok) {
-        const error = await response.text();
-        throw new BadRequestException(`Failed to upload plain data: ${error}`);
-      }
-
-      return await response.json();
+      return response.data;
     } catch (error) {
-      this.logger.error('Upload plain data error:', error);
-      throw new BadRequestException('Failed to upload plain data to Arka CDN');
+      this.logger.error('Upload plain data error:', error.response?.data || error.message);
+      throw new BadRequestException(`Failed to upload plain data to Arka CDN: ${error.response?.data?.message || error.message}`);
     }
   }
 
@@ -326,21 +321,11 @@ export class ArkaCDNService {
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}/upload`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${this.accessToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new BadRequestException('Failed to list files');
-      }
-
-      return await response.json();
+      const response = await this.httpClient.get('/upload');
+      return response.data;
     } catch (error) {
-      this.logger.error('List files error:', error);
-      throw new BadRequestException('Failed to list files from Arka CDN');
+      this.logger.error('List files error:', error.response?.data || error.message);
+      throw new BadRequestException(`Failed to list files from Arka CDN: ${error.response?.data?.message || error.message}`);
     }
   }
 
