@@ -87,7 +87,7 @@ export class ProfileController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Registrar snapshot de rating OL del jugador' })
   @ApiResponse({ status: 201, description: 'Snapshot registrado y nivel recalculado' })
-  async recordPlayerRating(@Request() req, @Body() body: import('./dto').RecordPlayerRatingDto) {
+  async recordPlayerRating(@Request() req, @Body() body: import('./dto/index.js').RecordPlayerRatingDto) {
     return this.profileService.recordPlayerRating(req.user.id, body);
   }
 
