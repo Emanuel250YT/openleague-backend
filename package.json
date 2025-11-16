@@ -25,6 +25,8 @@
     "hardhat:compile": "hardhat compile",
     "hardhat:test": "hardhat test",
     "hardhat:deploy": "hardhat run scripts/deploy.ts",
+    "hardhat:deploy-openleague": "hardhat run scripts/deploy-openleague.ts",
+    "hardhat:test-openleague": "hardhat run scripts/test-openleague.ts",
     "watch:deploy": "ts-node -T scripts/watch-and-deploy.ts"
   },
   "dependencies": {
