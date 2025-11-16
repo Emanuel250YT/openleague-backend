@@ -19,15 +19,17 @@ model User {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  tournaments   Tournament[]
-  wallets       Wallet[]
-  tokens        Token[]
-  otpCodes      OtpCode[]
-  files         File[]
-  playerProfile PlayerProfile?
-  clubProfile   ClubProfile?
-  coachProfile  CoachProfile?
-  fanProfile    FanProfile?
+  tournaments          Tournament[]
+  wallets              Wallet[]
+  tokens               Token[]
+  otpCodes             OtpCode[]
+  files                File[]
+  playerProfile        PlayerProfile?
+  clubProfile          ClubProfile?
+  coachProfile         CoachProfile?
+  fanProfile           FanProfile?
+  notifications        Notification[]
+  challengeSubmissions ChallengeSubmission[]
 
   @@map("users")
 }
@@ -277,4 +279,110 @@ model FanProfile {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("fan_profiles")
+}
+
+// ============================================
+// SISTEMA DE NOTIFICACIONES
+// ============================================
+
+enum NotificationType {
+  CHALLENGE_NEW // Nuevo reto disponible
+  CHALLENGE_ENDING // Reto próximo a expirar
+  CHALLENGE_EXPIRED // Reto expirado
+  SUBMISSION_APPROVED // Participación aprobada
+  SUBMISSION_REJECTED // Participación rechazada
+  TOURNAMENT_START // Torneo iniciado
+  TOURNAMENT_END // Torneo finalizado
+  ACHIEVEMENT // Nuevo logro desbloqueado
+  SYSTEM // Notificación del sistema
+  PROFILE_UPDATE // Actualización de perfil
+  WALLET_ACTIVITY // Actividad en wallet
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  type      NotificationType
+  title     String
+  message   String
+  data      Json? // Datos adicionales específicos del tipo
+  isRead    Boolean          @default(false)
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+// ============================================
+// SISTEMA DE RETOS (CHALLENGES)
+// ============================================
+
+enum ChallengeDifficulty {
+  EASY // 24 horas
+  MEDIUM // 7 días
+  HARD // 14 días
+  EXTREME // 30 días
+}
+
+enum ChallengeStatus {
+  ACTIVE // Reto activo
+  EXPIRED // Reto expirado
+  COMPLETED // Reto completado (alcanzó objetivo)
+}
+
+model Challenge {
+  id              String              @id @default(uuid())
+  title           String
+  description     String
+  difficulty      ChallengeDifficulty
+  status          ChallengeStatus     @default(ACTIVE)
+  requiredActions Int                 @default(1) // Número de participaciones requeridas
+  rewards         Json? // Recompensas del reto
+  metadata        Json? // Datos adicionales (tags, categorías, etc.)
+  arkaFileId      String? // ID del archivo de referencia en Arka CDN
+  thumbnailUrl    String?
+  startDate       DateTime            @default(now())
+  expiresAt       DateTime // Fecha de expiración automática
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  submissions ChallengeSubmission[]
+
+  @@index([status, expiresAt])
+  @@index([difficulty])
+  @@map("challenges")
+}
+
+enum SubmissionStatus {
+  PENDING // En revisión
+  APPROVED // Aprobado
+  REJECTED // Rechazado
+}
+
+model ChallengeSubmission {
+  id           String           @id @default(uuid())
+  description  String?
+  arkaFileId   String // ID del video en Arka CDN
+  videoUrl     String // URL pública del video
+  thumbnailUrl String?
+  status       SubmissionStatus @default(PENDING)
+  score        Int? // Puntuación asignada
+  feedback     String? // Comentarios del staff
+  metadata     Json? // Datos adicionales
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, challengeId]) // Un usuario solo puede enviar una participación por reto
+  @@index([challengeId, status])
+  @@index([userId])
+  @@map("challenge_submissions")
 }

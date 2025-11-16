@@ -39,6 +39,7 @@
     "@nestjs/jwt": "^11.0.1",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^10.4.20",
+    "@nestjs/schedule": "^6.0.1",
     "@nestjs/swagger": "^7.1.16",
     "@openzeppelin/contracts": "^5.4.0",
     "@polkadot/api": "^16.5.2",

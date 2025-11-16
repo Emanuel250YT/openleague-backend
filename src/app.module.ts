@@ -7,6 +7,9 @@ import { AuthModule } from './auth/auth.module.js';
 import { EmailModule } from './email/email.module.js';
 import { UploadModule } from './upload/upload.module.js';
 import { ProfileModule } from './profile/profile.module.js';
+import { NotificationModule } from './notification/notification.module.js';
+import { ChallengeModule } from './challenge/challenge.module.js';
+import { TasksModule } from './tasks/tasks.module.js';
 
 @Module({
   imports: [
@@ -18,6 +21,9 @@ import { ProfileModule } from './profile/profile.module.js';
     EmailModule,
     UploadModule,
     ProfileModule,
+    NotificationModule,
+    ChallengeModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
