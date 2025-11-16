@@ -112,7 +112,7 @@ interface ArkaCDNStatusResponse {
 @Injectable()
 export class ArkaCDNService {
   private readonly logger = new Logger(ArkaCDNService.name);
-  private readonly baseUrl = 'https://arkacdn.cloudycoding.com/api';
+  private readonly baseUrl = 'https://arkacdn.openleague.pro/api';
   private accessToken: string | null = null;
   private readonly httpClient: AxiosInstance;
 
